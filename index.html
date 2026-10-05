@@ -264,12 +264,13 @@ function renderCart(){
     try{
       const r = await fetch(ORDER_URL, { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ initData: tg ? tg.initData : "", delivery, address: needAddr ? addr.trim() : "", items }) });
-      if(!r.ok) throw new Error(r.status);
+      if(!r.ok) throw new Error(r.status + ":" + await r.text());
       cart = []; delivery = ""; addr = ""; saveCart();
       $("#app").innerHTML = BACK + '<p class="empty">Заказ отправлен.<br>Продавец скоро свяжется с вами.</p>'; wireBack();
     }catch(e){
-      const code = /^\d+$/.test(e.message) ? e.message : "нет связи";
-      say(code === "401" ? "Откройте магазин через кнопку бота в Telegram, а не по ссылке в браузере." : `Не удалось отправить заказ (${code}). Попробуйте ещё раз или напишите продавцу.`, !!SELLER);
+      const [code, why] = /^\d+/.test(e.message) ? e.message.split(":") : ["нет связи", ""];
+      const hints = { no_init_data: "Откройте магазин через кнопку бота в Telegram, а не по ссылке в браузере.", expired: "Сессия устарела. Закройте магазин и откройте снова.", bad_hash: "Ошибка настройки магазина: токен бота не подходит. Сообщите продавцу." };
+      say((hints[why] || "Не удалось отправить заказ. Попробуйте ещё раз или напишите продавцу.") + ` (${code}${why ? " " + why : ""})`, !!SELLER);
       $("#buy").disabled = false;
     }
   };
