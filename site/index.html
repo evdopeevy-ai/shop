@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Магазин одежды</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Ruslan+Display&display=swap&subset=cyrillic" rel="stylesheet">
+<style>
+
+:root{--bg:#07050b;--card:#120e1a;--card2:#1a1424;--ink:#e3dfe9;--mute:#8a8299;--acc:#b08d4a;--accd:#5f4a26;--line:#2a2236;--bad:#d9625b;--title:#d9c9a0}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;min-height:100vh;color:var(--ink);font:500 19px/1.35 "Cormorant Garamond",Georgia,"Times New Roman",serif;padding-bottom:env(safe-area-inset-bottom)}
+body::before,body::after{content:"";position:fixed;inset:0;pointer-events:none}
+body::before{z-index:-2;background:url(wizard.jpg) 50% 22%/cover;filter:grayscale(.55) contrast(1.1) brightness(.8)}
+body::after{z-index:-1;background:radial-gradient(120% 80% at 50% 28%,rgba(7,5,11,.3),rgba(7,5,11,.93) 85%),linear-gradient(rgba(7,5,11,.4),rgba(7,5,11,.75))}
+h1,h2{font-family:"Ruslan Display",Georgia,serif;font-weight:400;color:var(--title)}
+header{position:sticky;top:0;z-index:5;text-align:center;padding:calc(14px + env(safe-area-inset-top)) 14px 10px;background:linear-gradient(rgba(7,5,11,.92) 70%,transparent)}
+header h1{margin:0 0 6px;font-size:30px;letter-spacing:.03em;text-shadow:0 0 18px rgba(194,155,82,.35)}
+nav{display:flex;justify-content:center;gap:20px;border-top:1px solid var(--line);padding-top:6px}
+nav button{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;color:var(--mute);padding:6px 4px;font-weight:700;font-size:19px}
+nav button.on{color:var(--acc);border-bottom-color:var(--acc)}
+button,input,select{font:inherit}
+button{cursor:pointer;border:1px solid var(--accd);background:none;color:var(--ink);border-radius:3px;padding:10px 16px;font-weight:700}
+button.main{background:linear-gradient(#d3ad62,#a9833f);border-color:#d3ad62;color:#1c1409}
+button:active{transform:scale(.98)}
+button:disabled{opacity:.5}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+main{padding:10px 16px 100px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px 14px}
+.item{background:none;border:0;padding:0;display:block;width:100%;text-align:center;color:var(--ink)}
+.arch{aspect-ratio:3/4;border-radius:50% 50% 4px 4px/34% 34% 4px 4px;overflow:hidden;border:1px solid var(--accd);background:var(--card2);box-shadow:0 0 22px rgba(90,60,150,.28)}
+.arch img,.arch .ph,.ph{width:100%;height:100%;object-fit:cover;display:block;background:var(--card2)}
+.item .t{display:flex;flex-direction:column;gap:2px;padding:10px 2px 0}
+.nm{font-size:20px;font-weight:700;line-height:1.15}
+.price{color:var(--acc);font-weight:700;font-size:20px}
+.out{color:var(--bad);font-size:16px}
+.empty{color:var(--mute);padding:56px 0;text-align:center;font-size:21px}
+.sheet{position:fixed;inset:0;background:rgba(6,4,12,.75);display:flex;align-items:flex-end;z-index:9}
+.sheet>div{background:var(--card);border-top:2px solid var(--acc);width:100%;max-height:94%;overflow:auto;text-align:center;padding:20px 18px calc(18px + env(safe-area-inset-bottom));border-radius:14px 14px 0 0}
+.sheet .arch{max-width:250px;margin:0 auto}
+.sheet h2{margin:14px 0 2px;font-size:26px}
+.sizes{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:14px 0 18px}
+.sizes button{min-width:48px;height:48px;border-radius:50%;padding:0 8px}
+.sizes button.on{background:var(--acc);border-color:var(--acc);color:#1c1409}
+label{display:block;margin:14px 0 4px;color:var(--mute);font-size:17px}
+input[type=text],input[type=number]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:3px;background:#120e1c;color:var(--ink)}
+input[type=file]{color:var(--mute);max-width:100%}
+.row{display:flex;gap:12px;align-items:center;background:rgba(18,14,26,.88);border:1px solid var(--line);padding:8px;margin-bottom:10px;border-radius:4px}
+.row img,.row .ph{width:52px;height:68px;flex:none;border-radius:26px 26px 3px 3px;object-fit:cover}
+.row .g{flex:1;min-width:0;font-weight:700}
+.row .a{display:flex;flex-direction:column;gap:6px}
+.row .a button{padding:5px 10px;font-size:16px}
+.dl{display:flex;flex-wrap:wrap;gap:8px}
+.dl button.on{background:var(--acc);border-color:var(--acc);color:#1c1409}
+.qty{display:flex;align-items:center;gap:8px;font-weight:700}
+.qty button{width:34px;height:34px;padding:0;border-radius:50%}
+.total{text-align:right;font-size:22px;margin:16px 0}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--acc);color:#1c1409;padding:10px 18px;border-radius:3px;font-weight:700;z-index:20}
+#fab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));width:62px;height:62px;padding:0;border-radius:50%;z-index:6;display:flex;align-items:center;justify-content:center;background:linear-gradient(#d3ad62,#a9833f);border:1px solid #e0bf7a;color:#1c1409;box-shadow:0 0 0 4px rgba(7,5,11,.55),0 0 26px rgba(194,155,82,.45)}
+#badge{position:absolute;top:-4px;right:-4px;min-width:24px;height:24px;padding:0 6px;border-radius:12px;background:var(--bad);color:#fff;font-size:15px;line-height:24px;text-align:center}
+.back{background:none;border:0;color:var(--acc);padding:6px 0;margin-bottom:4px}
+.msg{color:var(--bad);text-align:center;margin:12px 0;font-size:20px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="shopName"></h1>
+  <nav id="nav">
+    <button id="tShop" class="on">Каталог</button>
+    <button id="tAdmin" hidden>Мои товары</button>
+  </nav>
+</header>
+<main id="app"></main>
+<button id="fab" aria-label="Корзина"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg><span id="badge" hidden>0</span></button>
+
+<script>
+/* ===== НАСТРОЙКИ ===== */
+const ADMIN_IDS = [1390292429];            // сюда впишите свой Telegram ID, например [123456789]
+const SELLER = "dehumanizetor";               // ваш @username без @, куда придут заказы
+const CUR = "₽";
+const SHOP_NAME = "Лавка Чародея";   // название магазина в шапке
+
+/* ===== ХРАНИЛИЩЕ (Supabase) ===== */
+const SB_URL = "https://oogqxeelmthfvzitnnvh.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9vZ3F4ZWVsbXRoZnZ6aXRubnZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNTAxMTYsImV4cCI6MjEwNjYyNjExNn0.K4aAixtY0PelsNc43QxGVqegxCRF1k-9k6zG1el3CiI";
+async function sb(path, opts = {}){
+  const r = await fetch(SB_URL + "/rest/v1/products" + path, {
+    ...opts,
+    headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json", ...(opts.headers || {}) }
+  });
+  const t = await r.text();
+  if(!r.ok) throw new Error(t);
+  return t ? JSON.parse(t) : null;
+}
+const MIN = { Prefer: "return=minimal" };
+const store = {
+  load: () => sb("?select=*&order=created_at.desc"),
+  add: p => sb("", { method: "POST", headers: MIN, body: JSON.stringify(p) }),
+  setStock: (id, stock) => sb("?id=eq." + encodeURIComponent(id), { method: "PATCH", headers: MIN, body: JSON.stringify({ stock }) }),
+  remove: id => sb("?id=eq." + encodeURIComponent(id), { method: "DELETE" })
+};
+
+const tg = window.Telegram && Telegram.WebApp;
+if(tg){ tg.ready(); tg.expand(); }
+const uid = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+// Вне Telegram (проверка в браузере) кабинет открыт; в Telegram — только для ADMIN_IDS.
+const isAdmin = !tg || !tg.initData ? true : ADMIN_IDS.includes(uid);
+
+let products = [], tab = "shop", draftPhoto = "";
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money = n => Number(n).toLocaleString("ru-RU") + " " + CUR;
+
+$("#tAdmin").hidden = !isAdmin;
+$("#shopName").textContent = SHOP_NAME; document.title = SHOP_NAME;
+$("#tShop").onclick = () => setTab("shop");
+$("#fab").onclick = () => setTab("cart");
+$("#tAdmin").onclick = () => setTab("admin");
+function setTab(t){ tab = t; [["shop","#tShop"],["admin","#tAdmin"]].forEach(([k,id]) => $(id).classList.toggle("on", t===k)); $("#fab").hidden = t !== "shop"; render(); }
+
+const BACK = '<button class="back" id="back">← В каталог</button>';
+function wireBack(){ const b = $("#back"); if(b) b.onclick = () => setTab("shop"); }
+function render(){ tab==="shop" ? renderShop() : tab==="cart" ? renderCart() : renderAdmin(); wireBack(); }
+
+function renderShop(){
+  const list = products.filter(p => p.stock);
+  if(!list.length){ $("#app").innerHTML = '<p class="empty">Полки пока пусты. Загляните позже.</p>'; return; }
+  $("#app").innerHTML = '<div class="grid">' + list.map(p =>
+    `<button class="item" data-id="${p.id}"><div class="arch">${p.photo?`<img src="${p.photo}" alt="">`:'<div class="ph"></div>'}</div>
+     <div class="t"><span class="nm">${esc(p.name)}</span><span class="price">${money(p.price)}</span></div></button>`).join("") + '</div>';
+  document.querySelectorAll(".item").forEach(b => b.onclick = () => openItem(b.dataset.id));
+}
+
+function openItem(id){
+  const p = products.find(x => x.id === id); if(!p) return;
+  const sizes = p.sizes.length ? p.sizes : [];
+  let size = "";
+  const el = document.createElement("div"); el.className = "sheet";
+  el.innerHTML = `<div><div class="arch">${p.photo?`<img src="${p.photo}" alt="">`:'<div class="ph"></div>'}</div>
+    <h2>${esc(p.name)}</h2><div class="price">${money(p.price)}</div>
+    ${sizes.length?`<div class="sizes">${sizes.map(s=>`<button data-s="${esc(s)}">${esc(s)}</button>`).join("")}</div>`:''}
+    <button class="main" id="order" style="width:100%">В корзину</button>
+    <button id="close" style="width:100%;margin-top:8px">Закрыть</button></div>`;
+  document.body.appendChild(el);
+  el.onclick = e => { if(e.target === el) el.remove(); };
+  el.querySelector("#close").onclick = () => el.remove();
+  el.querySelectorAll(".sizes button").forEach(b => b.onclick = () => {
+    size = b.dataset.s; el.querySelectorAll(".sizes button").forEach(x => x.classList.toggle("on", x === b));
+  });
+  el.querySelector("#order").onclick = () => {
+    if(sizes.length && !size){ toast("Выберите размер", 2200); return; }
+    addToCart(p.id, size); el.remove();
+  };
+}
+
+function renderAdmin(){
+  $("#app").innerHTML = `
+    <h2 style="margin:8px 0">Новый товар</h2>
+    <label>Фото</label><input type="file" id="f" accept="image/*">
+    <label>Название</label><input type="text" id="n">
+    <label>Цена, ${CUR}</label><input type="number" id="p" inputmode="numeric" min="0">
+    <label>Размеры через запятую (например: S, M, L)</label><input type="text" id="s">
+    <button class="main" id="add" style="width:100%;margin-top:16px">Добавить товар</button>
+    <h2 style="margin:24px 0 8px">Все товары</h2><div id="list"></div>`;
+  draftPhoto = "";
+  $("#f").onchange = e => shrink(e.target.files[0]);
+  $("#add").onclick = addProduct;
+  drawList();
+}
+
+function drawList(){
+  $("#list").innerHTML = products.length ? products.map(p => `
+    <div class="row">${p.photo?`<img src="${p.photo}" alt="">`:'<div class="ph"></div>'}
+      <div class="g">${esc(p.name)}<div class="price">${money(p.price)}</div>${p.stock?'':'<div class="out">Нет в наличии</div>'}</div>
+      <div class="a"><button data-st="${p.id}">${p.stock?"Скрыть":"Вернуть"}</button><button data-del="${p.id}">Удалить</button></div>
+    </div>`).join("") : '<p class="empty">Добавьте первый товар выше.</p>';
+  document.querySelectorAll("[data-st]").forEach(b => b.onclick = async () => { const p = products.find(x=>x.id===b.dataset.st); p.stock = !p.stock;
+    try{ await store.setStock(p.id, p.stock); }catch(e){ p.stock = !p.stock; alert("Не удалось сохранить. Попробуйте ещё раз."); } drawList(); });
+  document.querySelectorAll("[data-del]").forEach(b => b.onclick = async () => { if(!confirm("Удалить товар?")) return;
+    try{ await store.remove(b.dataset.del); products = products.filter(x=>x.id!==b.dataset.del); }catch(e){ alert("Не удалось удалить. Попробуйте ещё раз."); } drawList(); });
+}
+
+function shrink(file){
+  if(!file) return;
+  const img = new Image(), r = new FileReader();
+  r.onload = () => { img.src = r.result; };
+  img.onload = () => {
+    const k = Math.min(1, 700 / Math.max(img.width, img.height)), c = document.createElement("canvas");
+    c.width = img.width * k; c.height = img.height * k;
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    draftPhoto = c.toDataURL("image/jpeg", .8);
+  };
+  r.readAsDataURL(file);
+}
+
+async function addProduct(){
+  const name = $("#n").value.trim(), price = Number($("#p").value);
+  if(!name || !price){ alert("Укажите название и цену"); return; }
+  const sizes = $("#s").value.split(",").map(x => x.trim()).filter(Boolean);
+  const item = { id: String(Date.now()), name, price, sizes, photo: draftPhoto, stock: true };
+  $("#add").disabled = true;
+  try{ await store.add(item); products.unshift(item); renderAdmin(); }
+  catch(e){ $("#add").disabled = false; alert("Не удалось добавить товар. Проверьте интернет и попробуйте ещё раз."); }
+}
+
+/* ===== КОРЗИНА ===== */
+const ORDER_URL = "/.netlify/functions/order";
+let cart = [], delivery = "", addr = "";
+const DELIVERY = ["Самовывоз", "СДЭК", "Почта России"];
+try{ cart = JSON.parse(localStorage.getItem("cart") || "[]"); }catch(e){}
+const cartCount = () => cart.reduce((n,i) => n + i.qty, 0);
+function saveCart(){
+  try{ localStorage.setItem("cart", JSON.stringify(cart)); }catch(e){}
+  const n = cartCount(); $("#badge").textContent = n; $("#badge").hidden = !n;
+}
+function toast(t, ms = 1400){ const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), ms); }
+function addToCart(id, size){
+  const i = cart.find(x => x.id === id && x.size === size);
+  i ? i.qty++ : cart.push({ id, size, qty: 1 }); saveCart(); toast("Добавлено в корзину");
+}
+const cartLines = () => cart.map(item => ({ item, p: products.find(x => x.id === item.id) })).filter(l => l.p && l.p.stock);
+
+function renderCart(){
+  const L = cartLines();
+  if(!L.length){ $("#app").innerHTML = BACK + '<p class="empty">В корзине пусто.</p>'; return; }
+  const total = L.reduce((s,l) => s + l.p.price * l.item.qty, 0);
+  $("#app").innerHTML = BACK + '<h2 style="margin:8px 0">Корзина</h2>' + L.map((l,k) => `
+    <div class="row">${l.p.photo?`<img src="${l.p.photo}" alt="">`:'<div class="ph"></div>'}
+      <div class="g">${esc(l.p.name)}${l.item.size?`, ${esc(l.item.size)}`:""}<div class="price">${money(l.p.price * l.item.qty)}</div></div>
+      <div class="qty"><button data-m="${k}">−</button><span>${l.item.qty}</span><button data-p="${k}">+</button></div>
+    </div>`).join("") + `
+    <label>Способ получения</label>
+    <div class="dl">${DELIVERY.map(d => `<button data-d="${d}" class="${d===delivery?"on":""}">${d}</button>`).join("")}</div>
+    <div id="adr" ${delivery && delivery !== "Самовывоз" ? "" : "hidden"}><label>Город, адрес или пункт выдачи, индекс</label><input type="text" id="ad" maxlength="200" value="${esc(addr)}"></div>
+    <p class="total">Итого: <span class="price">${money(total)}</span></p>
+    <button class="main" id="buy" style="width:100%">Оформить заказ</button>
+    <p id="msg" class="msg" hidden></p><button id="alt" hidden style="width:100%">Написать продавцу</button>`;
+  document.querySelectorAll("[data-m],[data-p]").forEach(b => b.onclick = () => {
+    const it = L[b.dataset.m ?? b.dataset.p].item; it.qty += b.dataset.m !== undefined ? -1 : 1;
+    if(it.qty < 1) cart = cart.filter(x => x !== it);
+    saveCart(); renderCart();
+  });
+  document.querySelectorAll("[data-d]").forEach(b => b.onclick = () => {
+    delivery = b.dataset.d;
+    document.querySelectorAll("[data-d]").forEach(x => x.classList.toggle("on", x === b));
+    $("#adr").hidden = delivery === "Самовывоз";
+  });
+  $("#ad").oninput = e => { addr = e.target.value; };
+  const say = (t, alt) => { const m = $("#msg"); m.textContent = t; m.hidden = false; $("#alt").hidden = !alt; m.scrollIntoView({ block: "center" }); };
+  $("#buy").onclick = async () => {
+    $("#msg").hidden = true; $("#alt").hidden = true;
+    if(!delivery){ say("Выберите способ получения выше."); return; }
+    const needAddr = delivery !== "Самовывоз";
+    if(needAddr && !addr.trim()){ say("Укажите город и адрес или пункт выдачи."); return; }
+    const items = L.map(l => ({ name: l.p.name, size: l.item.size, qty: l.item.qty, price: l.p.price }));
+    const text = "Хочу заказать:\n" + items.map(i => `${i.name}${i.size?`, ${i.size}`:""} × ${i.qty}`).join("\n") + `\nИтого: ${money(total)}\nПолучение: ${delivery}` + (needAddr ? `\nАдрес: ${addr.trim()}` : "");
+    $("#alt").onclick = () => { const url = `https://t.me/${SELLER}?text=${encodeURIComponent(text)}`; tg ? tg.openTelegramLink(url) : window.open(url, "_blank"); };
+    $("#buy").disabled = true;
+    try{
+      const r = await fetch(ORDER_URL, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData: tg ? tg.initData : "", delivery, address: needAddr ? addr.trim() : "", items }) });
+      if(!r.ok) throw new Error(r.status);
+      cart = []; delivery = ""; addr = ""; saveCart();
+      $("#app").innerHTML = BACK + '<p class="empty">Заказ отправлен.<br>Продавец скоро свяжется с вами.</p>'; wireBack();
+    }catch(e){
+      const code = /^\d+$/.test(e.message) ? e.message : "нет связи";
+      say(code === "401" ? "Откройте магазин через кнопку бота в Telegram, а не по ссылке в браузере." : `Не удалось отправить заказ (${code}). Попробуйте ещё раз или напишите продавцу.`, !!SELLER);
+      $("#buy").disabled = false;
+    }
+  };
+}
+saveCart();
+
+$("#app").innerHTML = '<p class="empty">Зажигаем свечи…</p>';
+store.load().then(l => { products = l; render(); })
+  .catch(() => { $("#app").innerHTML = '<p class="empty">Не удалось загрузить каталог. Обновите страницу.</p>'; });
+</script>
+</body>
+</html>
